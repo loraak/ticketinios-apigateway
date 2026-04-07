@@ -6,7 +6,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-    "type": "module",
+  "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js"
@@ -16,6 +16,8 @@
     "@fastify/http-proxy": "^11.4.3",
     "@fastify/jwt": "^10.0.0",
     "@fastify/rate-limit": "^10.3.0",
+    "@fastify/swagger": "^9.7.0",
+    "@fastify/swagger-ui": "^5.2.5",
     "dotenv": "^17.4.1",
     "fastify": "^5.8.4",
     "fastify-plugin": "^5.1.0"
