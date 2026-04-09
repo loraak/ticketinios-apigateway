@@ -66,5 +66,11 @@ export async function buildApp() {
     rewritePrefix: '/api/grupos',
   })
 
+  await app.register(httpProxy, {
+    upstream: process.env.TICKETS_SERVICE_URL,
+    prefix: '/api/tickets',
+    rewritePrefix: '/api/tickets',
+})
+
   return app
 }
