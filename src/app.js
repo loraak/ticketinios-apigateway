@@ -5,6 +5,7 @@ import httpProxy from '@fastify/http-proxy'
 import Fastify from 'fastify'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
+import { authHook } from './hooks/authHook.js'
 
 export async function buildApp() {
   const app = Fastify({ logger: true })
@@ -23,7 +24,7 @@ export async function buildApp() {
     uiConfig: {
       urls: [
         { url: '/docs-json/auth',   name: 'Auth Service' },
-        { url: '/docs-json/grupos', name: 'Grupos Service' } // ← agrega esto
+        { url: '/docs-json/grupos', name: 'Grupos Service' }
       ],
       urls_primary_name: 'Auth Service'
     }
@@ -40,7 +41,6 @@ export async function buildApp() {
     }
   })
 
-  // ← Agrega el docs de grupos
   app.get('/docs-json/grupos', async (request, reply) => {
     try {
       const response = await fetch(`${process.env.GRUPOS_SERVICE_URL}/v3/api-docs`)
@@ -50,6 +50,9 @@ export async function buildApp() {
     }
   })
 
+  // Guard JWT — /api/grupos queda protegido automáticamente
+  await authHook(app);
+
   // Proxies
   await app.register(httpProxy, {
     upstream: process.env.AUTH_SERVICE_URL,
@@ -57,27 +60,10 @@ export async function buildApp() {
     rewritePrefix: '/api/auth',
   })
 
-  // ← Agrega el proxy de grupos
   await app.register(httpProxy, {
     upstream: process.env.GRUPOS_SERVICE_URL,
     prefix: '/api/grupos',
     rewritePrefix: '/api/grupos',
-  })
-
-  // Guard JWT — /api/grupos queda protegido automáticamente
-  app.addHook('onRequest', async (request, reply) => {
-    const publicPaths = [
-      '/api/auth/login',
-      '/api/auth/register',
-      '/health',
-      '/docs',
-      '/docs-json/auth',
-      '/docs-json/grupos',
-    ]
-    const isPublic = publicPaths.some(p => request.url.startsWith(p))
-    if (!isPublic) {
-      await app.authenticate(request, reply)
-    }
   })
 
   return app
