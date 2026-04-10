@@ -10,6 +10,19 @@ import { authHook } from './hooks/authHook.js'
 export async function buildApp() {
   const app = Fastify({ logger: true })
 
+  app.addHook('preHandler', async (request, reply) => {
+    delete request.headers['origin']
+    delete request.headers['referer']
+  })
+
+  app.addHook('onRequest', async (request, reply) => {
+    console.log('=== REQUEST ===')
+    console.log('URL:', request.url)
+    console.log('Method:', request.method)
+    console.log('Origin:', request.headers.origin)
+    console.log('===============')
+  })
+
   await app.register(corsPlugin)
   await app.register(jwtPlugin)
   await app.register(rateLimitPlugin)
