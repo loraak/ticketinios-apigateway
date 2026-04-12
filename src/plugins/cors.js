@@ -5,7 +5,8 @@ export default fp(async (app) => {
   await app.register(cors, {
     origin: [
       'http://localhost:4200',   // Angular
-      'http://localhost:3000',   // Swagger UI
+      'http://localhost:3000',   
+      'http://localhost:8081',  // Swagger Auth
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']

@@ -10,6 +10,7 @@ export async function authHook(app) {
             '/docs',
             '/docs-json/auth',
             '/docs-json/grupos',
+            '/docs-json/tickets'
         ];
 
         const isPublic = publicPaths.some(p => request.url.startsWith(p));
@@ -29,19 +30,26 @@ export async function authHook(app) {
         // 3 — Busca si la ruta requiere un permiso
         const regla = permissionsMap.find(r =>
             r.method === request.method &&
-            request.url.startsWith(r.path)
+            request.url.startsWith(r.path) &&
+            (!r.pathContains || request.url.includes(r.pathContains))
         );
+
+        const authHeader = request.headers['authorization'];
+        if (authHeader) {
+            request.headers['x-gateway-token'] = authHeader;
+        }
 
         console.log('method:', request.method);
         console.log('url:', request.url);
-        console.log('regla encontrada:', regla);
-        console.log('permisos usuario:', permisos);console.log('match?', '/api/auth/update/c083829d-1551-45ea-80ae-41222059e4d0'.startsWith('/api/auth/update/'));
+        console.log('token:', request.headers['authorization']?.substring(0, 30));
+        console.log('regla:', regla);
+        console.log('permisos:', permisos);
 
         if (regla && !permisos.includes(regla.permission)) {
             return reply.code(403).send({
                 statusCode: 403,
                 intOpCode: 'GW-FORBIDDEN',
-                message: `Permiso requerido: ${regla.permission}`
+                data: [{ message: `Permiso requerido: ${regla.permission}` }] // ← formato consistente
             });
         }
     });

@@ -10,6 +10,15 @@ import { authHook } from './hooks/authHook.js'
 export async function buildApp() {
   const app = Fastify({ logger: true })
 
+  app.setErrorHandler((error, request, reply) => {
+    console.error(error);
+    reply.code(error.statusCode ?? 500).send({
+        statusCode: error.statusCode ?? 500,
+        intOpCode: 'MS-TICKETS-ERROR',
+        data: [{ message: error.message || 'Error inesperado.' }]
+    });
+  });
+
   app.addHook('preHandler', async (request, reply) => {
     delete request.headers['origin']
     delete request.headers['referer']
@@ -37,13 +46,14 @@ export async function buildApp() {
     uiConfig: {
       urls: [
         { url: '/docs-json/auth',   name: 'Auth Service' },
-        { url: '/docs-json/grupos', name: 'Grupos Service' }
+        { url: '/docs-json/grupos', name: 'Grupos Service' }, 
+        { url: '/docs-json/tickets', name: 'Tickets Service' }
       ],
       urls_primary_name: 'Auth Service'
     }
   })
-
-  app.get('/health', async () => ({ status: 'ok', gateway: 'fastify' }))
+  
+  app.get('/health', async () => ({ statusCode: 200, intOpCode: 'API-GATEWAY-OK', data: [{ message: 'API Gateway funcionando' }] }))
 
   app.get('/docs-json/auth', async (request, reply) => {
     try {
@@ -63,6 +73,15 @@ export async function buildApp() {
     }
   })
 
+  app.get('/docs-json/tickets', async (request, reply) => {
+    try {
+      const response = await fetch(`${process.env.TICKETS_SERVICE_URL}/docs/json`)
+      return reply.send(await response.json())
+    } catch {
+      return reply.code(502).send({ error: 'Tickets service no disponible' })
+    }
+  })
+
   // Guard JWT — /api/grupos queda protegido automáticamente
   await authHook(app);
 
@@ -71,6 +90,12 @@ export async function buildApp() {
     upstream: process.env.AUTH_SERVICE_URL,
     prefix: '/api/auth',
     rewritePrefix: '/api/auth',
+  })
+
+    await app.register(httpProxy, {
+    upstream: process.env.AUTH_SERVICE_URL,
+    prefix: '/api/usuarios',
+    rewritePrefix: '/api/usuarios',
   })
 
   await app.register(httpProxy, {
@@ -83,6 +108,7 @@ export async function buildApp() {
     upstream: process.env.TICKETS_SERVICE_URL,
     prefix: '/api/tickets',
     rewritePrefix: '/api/tickets',
+    httpMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 })
 
   return app

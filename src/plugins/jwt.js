@@ -13,7 +13,7 @@ export default fp(async (app) => {
       return reply.code(401).send({
         statusCode: 401,
         intOpCode: 'API-GATEWAY-UNAUTHORIZED',
-        data: [],
+        data: [{ message: 'Token inválido o expirado' }]
       })
     }
   })
