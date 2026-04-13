@@ -17,6 +17,7 @@ export const permissionsMap = [
     // Gestión de grupos — específicas primero
     { method: 'GET',    path: '/api/grupos/admin',             permission: 'gestionarGrupos:ver' },
     { method: 'PATCH',  path: '/api/grupos/admin/',            permission: 'gestionarGrupos:eliminar' },
+    { method: 'PUT',    path: '/api/grupos/admin/', contains: '/permisos',   permission: 'gestionarGrupos:editar_grupo' },
     { method: 'POST',   path: '/api/grupos/', contains: '/miembros',   permission: 'gestionarGrupos:agregar_usuario' },
     { method: 'DELETE', path: '/api/grupos/', contains: '/miembros',   permission: 'gestionarGrupos:agregar_usuario' },
     { method: 'PUT',    path: '/api/grupos/', contains: '/permisos',   permission: 'gestionarGrupos:modificar_permisos' },
