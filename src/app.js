@@ -1,6 +1,7 @@
 import corsPlugin from './plugins/cors.js'
 import jwtPlugin from './plugins/jwt.js'
 import rateLimitPlugin from './plugins/rateLimit.js'
+import loggerPlugin from './plugins/logger.js'
 import httpProxy from '@fastify/http-proxy'
 import Fastify from 'fastify'
 import fastifySwagger from '@fastify/swagger'
@@ -23,18 +24,11 @@ export async function buildApp() {
     delete request.headers['origin']
     delete request.headers['referer']
   })
-
-  app.addHook('onRequest', async (request, reply) => {
-    console.log('=== REQUEST ===')
-    console.log('URL:', request.url)
-    console.log('Method:', request.method)
-    console.log('Origin:', request.headers.origin)
-    console.log('===============')
-  })
-
+  
   await app.register(corsPlugin)
   await app.register(jwtPlugin)
   await app.register(rateLimitPlugin)
+  await app.register(loggerPlugin)
 
   await app.register(fastifySwagger, {
     mode: 'dynamic',
