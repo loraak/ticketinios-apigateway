@@ -6,7 +6,7 @@ export default fp(async (app) => {
     origin: [
       'https://ticketinios-bz4j.vercel.app',
       'http://localhost:3000',   
-      'http://localhost:8081',  // Swagger Auth
+      'http://localhost:8081',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']

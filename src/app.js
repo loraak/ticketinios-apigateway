@@ -105,5 +105,9 @@ export async function buildApp() {
     httpMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 })
 
+  console.log('GRUPOS_SERVICE_URL:', process.env.GRUPOS_SERVICE_URL)
+  console.log('AUTH_SERVICE_URL:', process.env.AUTH_SERVICE_URL)
+  console.log('TICKETS_SERVICE_URL:', process.env.TICKETS_SERVICE_URL)
+
   return app
 }
