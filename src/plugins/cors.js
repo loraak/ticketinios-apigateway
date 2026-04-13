@@ -4,7 +4,7 @@ import cors from '@fastify/cors'
 export default fp(async (app) => {
   await app.register(cors, {
     origin: [
-      'https://ticketinios-bz4j-jul2pujsh-loros-projects-e0f80d4b.vercel.app',
+      'https://ticketinios-bz4j.vercel.app',
       'http://localhost:3000',   
       'http://localhost:8081',  // Swagger Auth
     ],
